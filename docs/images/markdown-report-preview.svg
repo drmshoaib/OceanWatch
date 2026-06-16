@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">OceanWatchAI Markdown risk report preview</title>
+  <desc id="desc">GitHub-style Markdown preview of the generated OceanWatchAI risk report.</desc>
+  <rect width="1200" height="680" fill="#0d1117"/>
+  <rect x="62" y="42" width="1076" height="596" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+
+  <text x="102" y="102" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700">OceanWatchAI Risk Report</text>
+  <text x="102" y="152" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Summary</text>
+
+  <rect x="102" y="178" width="420" height="210" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="102" y="178" width="420" height="42" fill="#f6f8fa"/>
+  <line x1="312" y1="178" x2="312" y2="388" stroke="#d0d7de"/>
+  <text x="124" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Metric</text>
+  <text x="342" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Value</text>
+  <text x="124" y="250" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">AIS points loaded</text>
+  <text x="382" y="250" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">8</text>
+  <text x="124" y="288" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">Vessels analysed</text>
+  <text x="382" y="288" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">3</text>
+  <text x="124" y="326" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">Protected areas loaded</text>
+  <text x="382" y="326" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">3</text>
+  <text x="124" y="364" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">High or critical vessels</text>
+  <text x="382" y="364" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">0</text>
+
+  <text x="584" y="152" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Top Suspicious Vessels</text>
+  <rect x="584" y="178" width="454" height="164" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="584" y="178" width="454" height="42" fill="#f6f8fa"/>
+  <text x="606" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Rank</text>
+  <text x="700" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Vessel ID</text>
+  <text x="872" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Score</text>
+  <text x="958" y="205" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700">Band</text>
+  <text x="618" y="250" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">1</text>
+  <text x="700" y="250" fill="#24292f" font-family="Consolas, 'Courier New', monospace" font-size="16">FV-OCEAN-002</text>
+  <text x="872" y="250" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">15.00</text>
+  <text x="958" y="250" fill="#1f883d" font-family="Segoe UI, Arial, sans-serif" font-size="16">Low</text>
+  <text x="618" y="288" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">2</text>
+  <text x="700" y="288" fill="#24292f" font-family="Consolas, 'Courier New', monospace" font-size="16">FV-OCEAN-001</text>
+  <text x="872" y="288" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">0.00</text>
+  <text x="958" y="288" fill="#1f883d" font-family="Segoe UI, Arial, sans-serif" font-size="16">Low</text>
+  <text x="618" y="326" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">3</text>
+  <text x="700" y="326" fill="#24292f" font-family="Consolas, 'Courier New', monospace" font-size="16">FV-OCEAN-003</text>
+  <text x="872" y="326" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="16">0.00</text>
+  <text x="958" y="326" fill="#1f883d" font-family="Segoe UI, Arial, sans-serif" font-size="16">Low</text>
+
+  <text x="102" y="452" fill="#24292f" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">High-Risk Explanations</text>
+  <rect x="102" y="480" width="936" height="74" rx="8" fill="#f6f8fa" stroke="#d0d7de"/>
+  <text x="130" y="525" fill="#57606a" font-family="Segoe UI, Arial, sans-serif" font-size="18">No vessels reached the High or Critical risk bands in this sample run.</text>
+
+  <text x="102" y="604" fill="#57606a" font-family="Segoe UI, Arial, sans-serif" font-size="16">Generated Markdown includes summary, ranked vessels, explanations, and documented limitations.</text>
+</svg>

@@ -213,13 +213,23 @@ Markdown report sections:
 
 ## Screenshots
 
-The visual overview above uses GitHub-rendered Mermaid diagrams so the README remains useful before a graphical dashboard exists. Screenshots can be added here once the command-line reports or a future dashboard are captured.
+The current project is a command-line prototype, so these are screenshot-style previews generated from the sample CLI workflow and report outputs. A future dashboard can replace or extend these with live map and analyst UI screenshots.
 
-Suggested placeholders:
+### CLI Run
 
-- CLI run producing `risk_report.csv` and `risk_report.md`
-- Rendered GitHub Markdown risk report
-- Visual Studio CMake test output
+![OceanWatchAI CLI sample run](docs/images/cli-run.svg)
+
+### CSV Report
+
+![OceanWatchAI CSV risk report preview](docs/images/csv-report-preview.svg)
+
+### Markdown Report
+
+![OceanWatchAI Markdown risk report preview](docs/images/markdown-report-preview.svg)
+
+### Test Output
+
+![OceanWatchAI CMake and CTest output](docs/images/test-output.svg)
 
 ## Methods Used
 

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">OceanWatchAI command-line run</title>
+  <desc id="desc">Terminal-style preview showing the OceanWatchAI sample command and generated report paths.</desc>
+  <rect width="1200" height="520" fill="#0d1117"/>
+  <rect x="36" y="36" width="1128" height="448" rx="12" fill="#161b22" stroke="#30363d"/>
+  <rect x="36" y="36" width="1128" height="52" rx="12" fill="#21262d"/>
+  <circle cx="66" cy="62" r="7" fill="#f85149"/>
+  <circle cx="91" cy="62" r="7" fill="#d29922"/>
+  <circle cx="116" cy="62" r="7" fill="#3fb950"/>
+  <text x="146" y="68" fill="#c9d1d9" font-family="Consolas, 'Courier New', monospace" font-size="18">PowerShell - OceanWatchAI sample run</text>
+
+  <text x="62" y="126" fill="#7ee787" font-family="Consolas, 'Courier New', monospace" font-size="19">PS&gt; .\out\build\ninja-debug\OceanWatchAI.exe `</text>
+  <text x="94" y="160" fill="#d2a8ff" font-family="Consolas, 'Courier New', monospace" font-size="19">--ais data\sample\sample_ais.csv `</text>
+  <text x="94" y="194" fill="#d2a8ff" font-family="Consolas, 'Courier New', monospace" font-size="19">--protected-areas data\sample\protected_areas.csv `</text>
+  <text x="94" y="228" fill="#d2a8ff" font-family="Consolas, 'Courier New', monospace" font-size="19">--output reports\risk_report.csv</text>
+
+  <rect x="62" y="260" width="700" height="144" rx="8" fill="#0d1117" stroke="#30363d"/>
+  <text x="86" y="304" fill="#c9d1d9" font-family="Consolas, 'Courier New', monospace" font-size="20">Analysed 3 vessels from 8 AIS points.</text>
+  <text x="86" y="340" fill="#c9d1d9" font-family="Consolas, 'Courier New', monospace" font-size="20">CSV report: reports\risk_report.csv</text>
+  <text x="86" y="376" fill="#c9d1d9" font-family="Consolas, 'Courier New', monospace" font-size="20">Markdown report: reports\risk_report.md</text>
+
+  <rect x="802" y="126" width="314" height="278" rx="10" fill="#0d1117" stroke="#30363d"/>
+  <text x="830" y="170" fill="#58a6ff" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">Generated artifacts</text>
+  <line x1="830" y1="188" x2="1088" y2="188" stroke="#30363d"/>
+  <text x="830" y="232" fill="#f0f6fc" font-family="Consolas, 'Courier New', monospace" font-size="18">risk_report.csv</text>
+  <text x="830" y="264" fill="#8b949e" font-family="Segoe UI, Arial, sans-serif" font-size="15">Compact scoring table</text>
+  <text x="830" y="318" fill="#f0f6fc" font-family="Consolas, 'Courier New', monospace" font-size="18">risk_report.md</text>
+  <text x="830" y="350" fill="#8b949e" font-family="Segoe UI, Arial, sans-serif" font-size="15">GitHub-friendly analyst report</text>
+
+  <text x="62" y="446" fill="#8b949e" font-family="Segoe UI, Arial, sans-serif" font-size="16">Sample output generated from data/sample/sample_ais.csv and data/sample/protected_areas.csv.</text>
+</svg>
