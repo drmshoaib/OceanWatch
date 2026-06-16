@@ -1,0 +1,40 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# CMake build output
+build/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Build artifacts
+bin/
+lib/
+*.obj
+*.o
+*.ilk
+*.pdb
+*.idb
+*.exe
+*.dll
+*.lib
+*.exp
+
+# Test and coverage output
+Testing/
+coverage/
+reports/
+*.gcda
+*.gcno
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
