@@ -1,6 +1,10 @@
 # OceanWatchAI
 
 [![CI](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C)
+![CMake](https://img.shields.io/badge/build-CMake-064F8C)
+![Catch2](https://img.shields.io/badge/tests-Catch2-2E7D32)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
 OceanWatchAI is a C++20 maritime intelligence prototype that analyses AIS vessel trajectory data and produces explainable suspicious-behaviour risk reports relevant to illegal fishing detection.
 
@@ -24,6 +28,134 @@ This project is intentionally scoped to AIS trajectory data. It does not process
 - Simple circular protected-area proximity analysis
 - CSV and GitHub-friendly Markdown report generation
 - Catch2 unit tests covering parser, geospatial, feature, risk, anomaly, protected-area, and report logic
+
+## Visual Overview
+
+### End-to-End Workflow
+
+```mermaid
+flowchart LR
+    A["AIS trajectory CSV"] --> B["Validate schema"]
+    B --> C["Skip malformed rows with warnings"]
+    C --> D["Group by vessel_id"]
+    D --> E["Sort by timestamp"]
+    E --> F["Compute track features"]
+    F --> G["Score suspicious behaviour"]
+    G --> H["Write CSV report"]
+    G --> I["Write Markdown report"]
+```
+
+### Data Model
+
+```mermaid
+classDiagram
+    class AISPoint {
+        string vessel_id
+        string timestamp
+        double latitude
+        double longitude
+        double speed_knots
+        double course_deg
+    }
+
+    class VesselTrack {
+        string vessel_id
+        vector~AISPoint~ points
+        add_point()
+        sort_by_timestamp()
+    }
+
+    class TrackFeatures {
+        double total_distance_km
+        double duration_hours
+        double fraction_low_speed
+        double fraction_high_turning
+        double loitering_score
+        double suspicious_manoeuvre_score
+    }
+
+    class RiskScoreResult {
+        string vessel_id
+        double total_score
+        RiskBand risk_band
+        vector~string~ explanations
+    }
+
+    VesselTrack "1" o-- "*" AISPoint
+    VesselTrack --> TrackFeatures
+    TrackFeatures --> RiskScoreResult
+```
+
+### Feature Engineering Map
+
+```mermaid
+flowchart TD
+    T["Ordered VesselTrack"] --> D["Distance and duration"]
+    T --> S["Reported speed profile"]
+    T --> H["Heading changes"]
+    T --> G["AIS time gaps"]
+
+    D --> F["total_distance_km<br/>duration_hours"]
+    S --> F2["mean_speed_knots<br/>max_speed_knots<br/>fraction_low_speed"]
+    H --> F3["fraction_high_turning<br/>mean_turning_angle"]
+    G --> F4["max_time_gap_hours<br/>number_of_ais_gaps"]
+
+    F2 --> L["loitering_score"]
+    F3 --> L
+    F3 --> M["suspicious_manoeuvre_score"]
+    F4 --> M
+```
+
+### Risk Scoring Weights
+
+```mermaid
+pie showData
+    title Risk score component weights
+    "Loitering" : 30
+    "AIS gaps" : 25
+    "Turning" : 20
+    "Low speed" : 15
+    "Route anomaly" : 10
+```
+
+### Risk Band Thresholds
+
+```mermaid
+flowchart LR
+    S["total_score 0-100"] --> L["Low<br/>0 <= score < 25"]
+    S --> M["Medium<br/>25 <= score < 50"]
+    S --> H["High<br/>50 <= score < 75"]
+    S --> C["Critical<br/>75 <= score <= 100"]
+```
+
+### Protected-Area Prototype
+
+```mermaid
+flowchart TB
+    P["AIS point"] --> D["Haversine distance to area centre"]
+    A["Circular protected area<br/>centre + radius_km"] --> D
+    D --> I{"distance <= radius?"}
+    I -->|yes| IN["Inside protected area"]
+    I -->|no| N{"distance <= radius + buffer?"}
+    N -->|yes| NEAR["Near protected area"]
+    N -->|no| OUT["Outside proximity zone"]
+```
+
+### CI And Test Coverage
+
+```mermaid
+flowchart LR
+    PR["Push or pull request"] --> CI["GitHub Actions"]
+    CI --> W["Windows CMake build"]
+    CI --> U["Ubuntu CMake build"]
+    W --> T["CTest"]
+    U --> T
+    T --> C1["CSV parser tests"]
+    T --> C2["Geospatial tests"]
+    T --> C3["Feature tests"]
+    T --> C4["Risk and anomaly tests"]
+    T --> C5["Report tests"]
+```
 
 ## System Architecture
 
@@ -81,7 +213,7 @@ Markdown report sections:
 
 ## Screenshots
 
-Screenshots can be added here once the command-line reports or a future dashboard are captured.
+The visual overview above uses GitHub-rendered Mermaid diagrams so the README remains useful before a graphical dashboard exists. Screenshots can be added here once the command-line reports or a future dashboard are captured.
 
 Suggested placeholders:
 
