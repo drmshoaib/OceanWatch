@@ -22,7 +22,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(nlohmann_json)
 
-add_library(oceanwatchai
+add_library(oceanwatchai_core
     src/AnalysisConfig.cpp
     src/AisCsvLoader.cpp
     src/FeatureExtractor.cpp
@@ -34,24 +34,28 @@ add_library(oceanwatchai
     src/VesselTrack.cpp
 )
 
-add_library(OceanWatchAI::oceanwatchai ALIAS oceanwatchai)
+add_library(OceanWatchAI::oceanwatchai ALIAS oceanwatchai_core)
 
-target_include_directories(oceanwatchai
+target_include_directories(oceanwatchai_core
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-target_compile_features(oceanwatchai PUBLIC cxx_std_20)
+target_compile_features(oceanwatchai_core PUBLIC cxx_std_20)
 
-target_link_libraries(oceanwatchai
+target_link_libraries(oceanwatchai_core
     PRIVATE nlohmann_json::nlohmann_json
 )
 
+set_target_properties(oceanwatchai_core PROPERTIES
+    OUTPUT_NAME oceanwatchai
+)
+
 if(MSVC)
-    target_compile_options(oceanwatchai PRIVATE /W4 /permissive-)
+    target_compile_options(oceanwatchai_core PRIVATE /W4 /permissive-)
 else()
-    target_compile_options(oceanwatchai PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(oceanwatchai_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 add_executable(OceanWatchAI
