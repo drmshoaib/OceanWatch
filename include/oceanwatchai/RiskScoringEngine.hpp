@@ -1,5 +1,6 @@
 #pragma once
 
+#include "oceanwatchai/AnalysisConfig.hpp"
 #include "oceanwatchai/StatisticalAnomalyDetector.hpp"
 #include "oceanwatchai/TrackFeatures.hpp"
 
@@ -36,8 +37,15 @@ struct RiskScoreResult {
 // Transparent rule-based risk scorer for engineered vessel-track features.
 class RiskScoringEngine {
 public:
+    RiskScoringEngine();
+    RiskScoringEngine(const RiskScoringConfig& risk_config, const RiskBandConfig& band_config);
+
     [[nodiscard]] RiskScoreResult score(const TrackFeatures& features) const;
     [[nodiscard]] RiskScoreResult score(const TrackFeatures& features, const AnomalyDetectionResult& route_anomaly) const;
+
+private:
+    RiskScoringConfig risk_config_;
+    RiskBandConfig band_config_;
 };
 
 } // namespace oceanwatchai

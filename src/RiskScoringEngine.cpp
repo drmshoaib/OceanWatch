@@ -11,21 +11,6 @@
 namespace oceanwatchai {
 namespace {
 
-constexpr double kLowBandUpper = 25.0;
-constexpr double kMediumBandUpper = 50.0;
-constexpr double kHighBandUpper = 75.0;
-
-constexpr double kLoiteringWeight = 0.30;
-constexpr double kAISGapWeight = 0.25;
-constexpr double kLowSpeedWeight = 0.15;
-constexpr double kTurningWeight = 0.20;
-constexpr double kRouteAnomalyWeight = 0.10;
-
-constexpr double kAISGapThresholdHours = 2.0;
-constexpr double kSevereAISGapHours = 6.0;
-constexpr double kMaxGapScaleHours = 10.0;
-constexpr double kGapCountScale = 3.0;
-
 [[nodiscard]] double clamp_score(double value)
 {
     return std::clamp(value, 0.0, 100.0);
@@ -92,30 +77,41 @@ void validate_route_anomaly(const TrackFeatures& features, const AnomalyDetectio
     return output.str();
 }
 
-[[nodiscard]] double ais_gap_component_score(const TrackFeatures& features)
+[[nodiscard]] std::string format_compact_hours(double hours)
 {
-    if (features.max_time_gap_hours <= kAISGapThresholdHours && features.number_of_ais_gaps == 0) {
+    std::ostringstream output;
+    if (std::abs(hours - std::round(hours)) < 1.0e-9) {
+        output << std::fixed << std::setprecision(0) << hours;
+    } else {
+        output << std::fixed << std::setprecision(1) << hours;
+    }
+    return output.str();
+}
+
+[[nodiscard]] double ais_gap_component_score(const TrackFeatures& features, const RiskScoringConfig& config)
+{
+    if (features.max_time_gap_hours <= config.ais_gap_threshold_hours && features.number_of_ais_gaps == 0) {
         return 0.0;
     }
 
     const auto gap_duration_score =
-        to_score((features.max_time_gap_hours - kAISGapThresholdHours) / kMaxGapScaleHours);
-    const auto gap_count_score = to_score(static_cast<double>(features.number_of_ais_gaps) / kGapCountScale);
+        to_score((features.max_time_gap_hours - config.ais_gap_threshold_hours) / config.max_gap_scale_hours);
+    const auto gap_count_score = to_score(static_cast<double>(features.number_of_ais_gaps) / config.gap_count_scale);
 
     return std::max(gap_duration_score, gap_count_score);
 }
 
-[[nodiscard]] RiskBand band_for_score(double total_score)
+[[nodiscard]] RiskBand band_for_score(double total_score, const RiskBandConfig& config)
 {
-    if (total_score < kLowBandUpper) {
+    if (total_score < config.low_upper_bound) {
         return RiskBand::Low;
     }
 
-    if (total_score < kMediumBandUpper) {
+    if (total_score < config.medium_upper_bound) {
         return RiskBand::Medium;
     }
 
-    if (total_score < kHighBandUpper) {
+    if (total_score < config.high_upper_bound) {
         return RiskBand::High;
     }
 
@@ -126,7 +122,9 @@ void validate_route_anomaly(const TrackFeatures& features, const AnomalyDetectio
     const TrackFeatures& features,
     double route_anomaly_score,
     const std::vector<std::string>* route_anomaly_explanations,
-    bool statistical_route_anomaly)
+    bool statistical_route_anomaly,
+    const RiskScoringConfig& risk_config,
+    const RiskBandConfig& band_config)
 {
     RiskScoreResult result{
         .vessel_id = features.vessel_id,
@@ -134,42 +132,45 @@ void validate_route_anomaly(const TrackFeatures& features, const AnomalyDetectio
 
     result.component_scores = RiskComponentScores{
         .loitering = to_score(features.loitering_score),
-        .AIS_gap = ais_gap_component_score(features),
+        .AIS_gap = ais_gap_component_score(features, risk_config),
         .low_speed = to_score(features.fraction_low_speed),
         .turning = to_score(features.fraction_high_turning),
         .route_anomaly = clamp_score(route_anomaly_score),
     };
 
     result.total_score = clamp_score(
-        kLoiteringWeight * result.component_scores.loitering +
-        kAISGapWeight * result.component_scores.AIS_gap +
-        kLowSpeedWeight * result.component_scores.low_speed +
-        kTurningWeight * result.component_scores.turning +
-        kRouteAnomalyWeight * result.component_scores.route_anomaly);
-    result.risk_band = band_for_score(result.total_score);
+        risk_config.loitering_weight * result.component_scores.loitering +
+        risk_config.ais_gap_weight * result.component_scores.AIS_gap +
+        risk_config.low_speed_weight * result.component_scores.low_speed +
+        risk_config.turning_weight * result.component_scores.turning +
+        risk_config.route_anomaly_weight * result.component_scores.route_anomaly);
+    result.risk_band = band_for_score(result.total_score, band_config);
 
-    if (result.component_scores.loitering >= 50.0) {
+    if (result.component_scores.loitering >= risk_config.elevated_component_threshold) {
         result.explanations.push_back(
             "Vessel displayed slow repeated turning behaviour consistent with loitering.");
     }
 
-    if (features.max_time_gap_hours > kSevereAISGapHours) {
+    if (features.max_time_gap_hours > risk_config.severe_ais_gap_hours) {
         result.explanations.push_back(
-            "AIS transmission gap exceeded 6 hours; maximum observed gap was " +
+            "AIS transmission gap exceeded " + format_compact_hours(risk_config.severe_ais_gap_hours) +
+            " hours; maximum observed gap was " +
             format_hours(features.max_time_gap_hours) + " hours.");
     } else if (features.number_of_ais_gaps > 0) {
-        result.explanations.push_back("AIS gaps above 2 hours were detected in the track.");
+        result.explanations.push_back(
+            "AIS gaps above " + format_compact_hours(risk_config.ais_gap_threshold_hours) +
+            " hours were detected in the track.");
     }
 
-    if (result.component_scores.low_speed >= 50.0) {
+    if (result.component_scores.low_speed >= risk_config.elevated_component_threshold) {
         result.explanations.push_back("A large share of AIS points were in the 1-5 knot low-speed band.");
     }
 
-    if (result.component_scores.turning >= 50.0) {
+    if (result.component_scores.turning >= risk_config.elevated_component_threshold) {
         result.explanations.push_back("Frequent heading changes above 45 degrees were detected.");
     }
 
-    if (result.component_scores.route_anomaly >= 50.0) {
+    if (result.component_scores.route_anomaly >= risk_config.elevated_component_threshold) {
         if (statistical_route_anomaly) {
             result.explanations.push_back(
                 "Route-anomaly component is elevated from fleet-baseline anomaly detection.");
@@ -210,10 +211,29 @@ std::string risk_band_to_string(RiskBand risk_band)
     return "Unknown";
 }
 
+RiskScoringEngine::RiskScoringEngine()
+    : RiskScoringEngine(RiskScoringConfig{}, RiskBandConfig{})
+{
+}
+
+RiskScoringEngine::RiskScoringEngine(const RiskScoringConfig& risk_config, const RiskBandConfig& band_config)
+    : risk_config_{risk_config}
+    , band_config_{band_config}
+{
+    validate_analysis_config(risk_config_);
+    validate_analysis_config(band_config_);
+}
+
 RiskScoreResult RiskScoringEngine::score(const TrackFeatures& features) const
 {
     validate_features(features);
-    return score_with_route_anomaly(features, to_score(features.suspicious_manoeuvre_score), nullptr, false);
+    return score_with_route_anomaly(
+        features,
+        to_score(features.suspicious_manoeuvre_score),
+        nullptr,
+        false,
+        risk_config_,
+        band_config_);
 }
 
 RiskScoreResult RiskScoringEngine::score(
@@ -222,7 +242,13 @@ RiskScoreResult RiskScoringEngine::score(
 {
     validate_features(features);
     validate_route_anomaly(features, route_anomaly);
-    return score_with_route_anomaly(features, route_anomaly.anomaly_score, &route_anomaly.explanations, true);
+    return score_with_route_anomaly(
+        features,
+        route_anomaly.anomaly_score,
+        &route_anomaly.explanations,
+        true,
+        risk_config_,
+        band_config_);
 }
 
 } // namespace oceanwatchai

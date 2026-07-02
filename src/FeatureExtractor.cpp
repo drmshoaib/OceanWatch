@@ -35,6 +35,8 @@ FeatureExtractor::FeatureExtractor(
     , low_speed_max_knots_{low_speed_max_knots}
     , high_turning_threshold_deg_{high_turning_threshold_deg}
     , ais_gap_threshold_hours_{ais_gap_threshold_hours}
+    , suspicious_manoeuvre_turning_weight_{FeatureExtractionConfig{}.suspicious_manoeuvre_turning_weight}
+    , suspicious_manoeuvre_gap_weight_{FeatureExtractionConfig{}.suspicious_manoeuvre_gap_weight}
 {
     require_finite(low_speed_min_knots_, "low_speed_min_knots");
     require_finite(low_speed_max_knots_, "low_speed_max_knots");
@@ -52,6 +54,17 @@ FeatureExtractor::FeatureExtractor(
     if (ais_gap_threshold_hours_ < 0.0) {
         throw std::invalid_argument{"AIS gap threshold must be non-negative"};
     }
+}
+
+FeatureExtractor::FeatureExtractor(const FeatureExtractionConfig& config)
+    : low_speed_min_knots_{config.low_speed_min_knots}
+    , low_speed_max_knots_{config.low_speed_max_knots}
+    , high_turning_threshold_deg_{config.high_turning_threshold_deg}
+    , ais_gap_threshold_hours_{config.ais_gap_threshold_hours}
+    , suspicious_manoeuvre_turning_weight_{config.suspicious_manoeuvre_turning_weight}
+    , suspicious_manoeuvre_gap_weight_{config.suspicious_manoeuvre_gap_weight}
+{
+    validate_analysis_config(config);
 }
 
 TrackFeatures FeatureExtractor::extract(const VesselTrack& track) const
@@ -126,7 +139,9 @@ TrackFeatures FeatureExtractor::extract(const VesselTrack& track) const
     const auto gap_fraction = static_cast<double>(features.number_of_ais_gaps) / static_cast<double>(transition_count);
     features.loitering_score = clamp_score(features.fraction_low_speed * features.fraction_high_turning);
     features.suspicious_manoeuvre_score =
-        clamp_score(0.7 * features.fraction_high_turning + 0.3 * gap_fraction);
+        clamp_score(
+            suspicious_manoeuvre_turning_weight_ * features.fraction_high_turning +
+            suspicious_manoeuvre_gap_weight_ * gap_fraction);
 
     return features;
 }
