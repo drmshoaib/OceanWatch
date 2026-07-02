@@ -1,4 +1,5 @@
 #include "oceanwatchai/AisCsvLoader.hpp"
+#include "oceanwatchai/AnalysisConfig.hpp"
 #include "oceanwatchai/FeatureExtractor.hpp"
 #include "oceanwatchai/ProtectedAreaProximity.hpp"
 #include "oceanwatchai/ReportWriter.hpp"
@@ -20,6 +21,7 @@ namespace {
 struct CliOptions {
     bool show_help{};
     std::filesystem::path ais_path;
+    std::optional<std::filesystem::path> config_path;
     std::optional<std::filesystem::path> protected_areas_path;
     std::filesystem::path csv_output_path;
     std::optional<std::filesystem::path> markdown_output_path;
@@ -37,6 +39,7 @@ Required:
   --output <path>              CSV report output path.
 
 Options:
+  --config <path>              Optional JSON analysis config file.
   --protected-areas <path>     Optional protected-area CSV file.
   --markdown-output <path>     Optional Markdown report output path.
                                Defaults to --output with a .md extension.
@@ -45,6 +48,7 @@ Options:
 
 Examples:
   OceanWatchAI.exe --ais data/sample/sample_ais.csv --output reports/risk_report.csv
+  OceanWatchAI.exe --ais data/sample/sample_ais.csv --config configs/default_config.json --output reports/risk_report.csv
   OceanWatchAI.exe --ais data/sample/sample_ais.csv --protected-areas data/sample/protected_areas.csv --output reports/risk_report.csv
 )";
 }
@@ -80,6 +84,8 @@ Examples:
             options.show_help = true;
         } else if (arg == "--ais") {
             options.ais_path = require_value(index, argc, argv, arg);
+        } else if (arg == "--config") {
+            options.config_path = require_value(index, argc, argv, arg);
         } else if (arg == "--protected-areas") {
             options.protected_areas_path = require_value(index, argc, argv, arg);
         } else if (arg == "--output") {
@@ -114,10 +120,11 @@ Examples:
 [[nodiscard]] std::vector<oceanwatchai::VesselAnalysisReport> analyse_vessels(
     const std::vector<oceanwatchai::VesselTrack>& tracks,
     const std::vector<oceanwatchai::ProtectedArea>& protected_areas,
-    bool analyse_protected_areas)
+    bool analyse_protected_areas,
+    const oceanwatchai::AnalysisConfig& config)
 {
-    const oceanwatchai::FeatureExtractor feature_extractor;
-    const oceanwatchai::RiskScoringEngine risk_scoring_engine;
+    const oceanwatchai::FeatureExtractor feature_extractor{config.feature_extraction};
+    const oceanwatchai::RiskScoringEngine risk_scoring_engine{config.risk_scoring, config.risk_bands};
     const oceanwatchai::ProtectedAreaProximityAnalyzer protected_area_analyzer;
 
     std::vector<oceanwatchai::VesselAnalysisReport> reports;
@@ -153,6 +160,9 @@ int main(int argc, char* argv[])
             return EXIT_SUCCESS;
         }
 
+        const auto config = options.config_path
+                                ? oceanwatchai::load_analysis_config_json(*options.config_path)
+                                : oceanwatchai::default_analysis_config();
         const auto ais_data = oceanwatchai::load_ais_csv(options.ais_path);
         for (const auto& warning : ais_data.warnings) {
             std::cerr << "warning: " << warning.message << '\n';
@@ -163,7 +173,8 @@ int main(int argc, char* argv[])
             protected_areas = oceanwatchai::load_protected_areas_csv(*options.protected_areas_path);
         }
 
-        const auto reports = analyse_vessels(ais_data.tracks, protected_areas, options.protected_areas_path.has_value());
+        const auto reports =
+            analyse_vessels(ais_data.tracks, protected_areas, options.protected_areas_path.has_value(), config);
         const auto markdown_report_path =
             options.markdown_output_path.value_or(default_markdown_report_path(options.csv_output_path));
 

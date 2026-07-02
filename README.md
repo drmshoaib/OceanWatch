@@ -248,6 +248,7 @@ C++ is a good fit for this prototype because maritime trajectory analysis can be
 ## Documentation
 
 - [System architecture](docs/system_architecture.md)
+- [Configuration](docs/configuration.md)
 - [Geospatial methods](docs/geospatial_methods.md)
 - [Risk model](docs/risk_model.md)
 - [Testing strategy](docs/testing.md)
@@ -288,6 +289,16 @@ The command writes:
 - `reports/risk_report.csv`
 - `reports/risk_report.md`
 
+To run with the checked-in default JSON configuration:
+
+```powershell
+.\out\build\ninja-debug\OceanWatchAI.exe `
+  --ais data\sample\sample_ais.csv `
+  --protected-areas data\sample\protected_areas.csv `
+  --config configs\default_config.json `
+  --output reports\risk_report.csv
+```
+
 To choose the Markdown path explicitly:
 
 ```powershell
@@ -312,7 +323,7 @@ include/         Public headers
 tests/           Catch2 unit tests
 data/sample/     Small AIS and protected-area CSV fixtures
 docs/            Architecture and methods documentation
-configs/         Placeholder for future runtime configuration
+configs/         Runtime analysis configuration defaults
 ```
 
 ## Limitations

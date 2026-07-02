@@ -40,3 +40,13 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(Catch)
 catch_discover_tests(oceanwatchai_tests)
+
+add_test(
+    NAME cli_config_loading
+    COMMAND
+        "${CMAKE_COMMAND}"
+        "-DCLI_EXECUTABLE=$<TARGET_FILE:OceanWatchAI>"
+        "-DSOURCE_DIR=${PROJECT_SOURCE_DIR}"
+        "-DTEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/cli_config_loading"
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/CliConfigIntegrationTest.cmake
+)
