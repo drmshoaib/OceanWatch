@@ -1,0 +1,33 @@
+{
+  "feature_extraction": {
+    "low_speed_min_knots": 1.0,
+    "low_speed_max_knots": 5.0,
+    "high_turning_threshold_deg": 45.0,
+    "ais_gap_threshold_hours": 2.0,
+    "suspicious_manoeuvre_turning_weight": 0.7,
+    "suspicious_manoeuvre_gap_weight": 0.3
+  },
+  "risk_scoring": {
+    "loitering_weight": 0.30,
+    "ais_gap_weight": 0.25,
+    "low_speed_weight": 0.15,
+    "turning_weight": 0.20,
+    "route_anomaly_weight": 0.10,
+    "ais_gap_threshold_hours": 2.0,
+    "severe_ais_gap_hours": 6.0,
+    "max_gap_scale_hours": 10.0,
+    "gap_count_scale": 3.0,
+    "elevated_component_threshold": 50.0
+  },
+  "risk_bands": {
+    "low_upper_bound": 25.0,
+    "medium_upper_bound": 50.0,
+    "high_upper_bound": 75.0
+  },
+  "protected_area": {
+    "near_buffer_km": 5.0,
+    "loitering_time_threshold_hours": 1.0,
+    "inside_score_per_hour": 50.0,
+    "near_score_per_hour": 25.0
+  }
+}

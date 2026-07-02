@@ -9,6 +9,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 add_executable(oceanwatchai_tests
+    AnalysisConfigTests.cpp
     CsvLoaderTests.cpp
     FeatureExtractorTests.cpp
     GeospatialUtilsTests.cpp
@@ -25,6 +26,10 @@ target_link_libraries(oceanwatchai_tests
 )
 
 target_compile_features(oceanwatchai_tests PRIVATE cxx_std_20)
+
+target_compile_definitions(oceanwatchai_tests
+    PRIVATE OCEANWATCHAI_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+)
 
 if(MSVC)
     target_compile_options(oceanwatchai_tests PRIVATE /W4 /permissive-)

@@ -12,7 +12,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(OCEANWATCHAI_BUILD_TESTS "Build OceanWatchAI unit tests" ${PROJECT_IS_TOP_LEVEL})
 
+include(FetchContent)
+
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.3
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
+
 add_library(oceanwatchai
+    src/AnalysisConfig.cpp
     src/AisCsvLoader.cpp
     src/FeatureExtractor.cpp
     src/GeospatialUtils.cpp
@@ -32,6 +43,10 @@ target_include_directories(oceanwatchai
 )
 
 target_compile_features(oceanwatchai PUBLIC cxx_std_20)
+
+target_link_libraries(oceanwatchai
+    PRIVATE nlohmann_json::nlohmann_json
+)
 
 if(MSVC)
     target_compile_options(oceanwatchai PRIVATE /W4 /permissive-)
